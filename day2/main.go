@@ -5,24 +5,99 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 )
 
-func checkAsc(num1, num2 int) bool {
-	return num1 != num2 && num1 < num2 && num2 - num1 > 3
-} 
+type LineDirectionType int
 
-func checkDesc(num1, num2 int) bool {
-	return num1 != num2 && num1 > num2 && num1 - num2 > 3
-}
+const (
+	Unclear LineDirectionType = iota
+	Ascending
+	Descending
+)
 
-func main() {
-	file, err := os.Open("./day2/puzzle.txt")
+func openFile(s string) *os.File {
+	file, err := os.Open(s)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
+	return file
+}
+
+func getLevelDifference(num1, num2 int) int {
+	diff := num1 - num2
+	if diff < 0 {
+		diff *= -1
+	}
+
+	return diff
+}
+
+func reportIsSafe(report []int) bool {
+	DirectionType := Unclear
+	prevNumber := 0
+
+	for index, level := range report {
+		if index == 0 {
+			prevNumber = level
+			continue
+		}
+
+		if prevNumber == level {
+			return false
+		}
+
+		diff := getLevelDifference(prevNumber, level)
+		if diff > 3 {
+			return false
+		}
+
+		switch DirectionType {
+		case Unclear:
+			if prevNumber < level {
+				DirectionType = Ascending
+			} else {
+				DirectionType = Descending
+			}
+		case Ascending:
+			if prevNumber > level {
+				return false
+			}
+		case Descending:
+			if prevNumber < level {
+				return false
+			}
+		}
+
+		prevNumber = level
+	}
+
+	return true
+}
+
+func reportHasSafeVariation(report []int) bool {
+
+	safe := false
+	for i := 0; i < len(report); i++ {
+		fmt.Printf("%d\n", report)
+		reportCopy := slices.Clone(report)
+		reportCopy = slices.Delete(reportCopy, i , i+1)
+		fmt.Printf("%d\n", reportCopy)
+
+		if reportIsSafe(reportCopy) {
+			safe = true
+			break
+		}
+	}
+
+	return safe
+}
+
+func main() {
+	file := openFile("./day2/puzzle.txt")
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
@@ -47,56 +122,12 @@ func main() {
 
 	safe_reports := 0
 	for _, report := range reports {
-		skip_used := false
+		safe := reportIsSafe(report) || reportHasSafeVariation(report)
 
-		asc_levels := false
-		for i := 0; i < len(report) - 1; i++ {
-			result := checkAsc(report[i], report[i+1])
-			if !result && skip_used {
-				asc_levels = false
-				break
-			}
-			if !result && i == 0 && checkAsc(report[i], report[i+2]) {
-				asc_levels = true
-				skip_used = true
-				continue
-			}
-			if !result && i > 0 && checkAsc(report[i-1], report[i+1]) {
-				asc_levels = true
-				skip_used = true
-				continue
-			}
-
-			asc_levels = true
-		}
-
-		skip_used = false
-		desc_levels := false
-		for i := 0; i < len(report) - 1; i++ {
-			result := checkDesc(report[i], report[i+1])
-			if !result && skip_used {
-				asc_levels = false
-				break
-			}
-			if !result && i == 0 && checkDesc(report[i], report[i+2]) {
-				asc_levels = true
-				skip_used = true
-				continue
-			}
-			if !result && i > 0 && checkDesc(report[i-1], report[i+1]) {
-				asc_levels = true
-				skip_used = true
-				continue
-			}
-			desc_levels = true
-		}
-
-		fmt.Printf("%d, asc: %t, desc: %t\n", report, asc_levels, desc_levels)
-
-		if asc_levels || desc_levels {
+		if safe {
 			safe_reports++
 		}
-		
+
 	}
 
 	fmt.Print(safe_reports)
