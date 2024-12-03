@@ -97,7 +97,7 @@ func reportHasSafeVariation(report []int) bool {
 }
 
 func main() {
-	file := openFile("./day2/puzzle.txt")
+	file := openFile("puzzle2.txt")
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)

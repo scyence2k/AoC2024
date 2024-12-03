@@ -20,7 +20,7 @@ func str_to_int(s string) int {
 }
 
 func main() {
-	file, err := os.Open("./day1/puzzle.txt")
+	file, err := os.Open("puzzle1.txt")
 	if err != nil {
 		log.Fatal(err.Error())
 	}
