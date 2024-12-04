@@ -1,4 +1,4 @@
-package main
+package day2
 
 import (
 	"bufio"
@@ -96,7 +96,7 @@ func reportHasSafeVariation(report []int) bool {
 	return safe
 }
 
-func main() {
+func Run() {
 	file := openFile("puzzle2.txt")
 	defer file.Close()
 

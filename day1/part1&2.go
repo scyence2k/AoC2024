@@ -1,4 +1,4 @@
-package main
+package day1
 
 import (
 	"bufio"
@@ -19,7 +19,7 @@ func str_to_int(s string) int {
 	return num
 }
 
-func main() {
+func Run() {
 	file, err := os.Open("puzzle1.txt")
 	if err != nil {
 		log.Fatal(err.Error())

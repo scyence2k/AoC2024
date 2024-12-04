@@ -1,4 +1,4 @@
-package main
+package day3
 
 import (
 	"fmt"
@@ -18,7 +18,7 @@ func openFile(s string) *os.File {
 	return file
 }
 
-func main() {
+func Run() {
 	file, err := os.ReadFile("puzzle3.txt")
 	if err != nil {
 		log.Fatal(err.Error())
